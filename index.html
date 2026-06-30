@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instinct MO • Kolbe-Style Instinct Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        :root {
+            --primary: #6366f1;
+        }
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+        }
+        .mode-fact { color: #3b82f6; }
+        .mode-follow { color: #10b981; }
+        .mode-quick { color: #f59e0b; }
+        .mode-impl { color: #ec4899; }
+        .quiz-option {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .quiz-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .quiz-option.selected {
+            border-color: #6366f1;
+            background-color: #f0f0ff;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .section-header {
+            font-size: 1.1rem;
+            letter-spacing: -.025em;
+        }
+        .mo-number {
+            font-size: 3.5rem;
+            line-height: 1;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .result-bar {
+            transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease;
+        }
+        .app-container {
+            max-width: 820px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .question-text {
+            font-size: 1.15rem;
+            line-height: 1.4;
+        }
+        .disclaimer {
+            font-size: 0.75rem;
+            line-height: 1.3;
+        }
+        .mode-badge {
+            font-size: 0.65rem;
+            padding: 1px 9px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200">
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-lg sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-x-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-inner">
+                    <i class="fa-solid fa-brain text-white text-2xl"></i>
+                </div>
+                <div>
+                    <span class="font-display text-2xl font-semibold tracking-tighter">Instinct MO</span>
+                    <span class="text-xs text-slate-500 block -mt-1">Educational Replica</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-x-2">
+                <div class="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-2xl text-xs flex items-center gap-x-1.5">
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    <span class="text-emerald-400 text-xs font-medium">For Educational Use</span>
+                </div>
+                <a href="https://www.kolbe.com/kolbe-a-index/" target="_blank" 
+                   class="text-xs px-4 py-2 rounded-2xl border border-slate-700 hover:bg-slate-800 transition-colors flex items-center gap-x-2 text-slate-400 hover:text-slate-200">
+                    <span>Official Kolbe A</span>
+                    <i class="fa-solid fa-external-link-alt text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- LANDING VIEW -->
+    <div id="landing-view">
+        <div class="max-w-4xl mx-auto px-6 pt-16 pb-12">
+            <!-- Hero -->
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center gap-x-2 bg-slate-900 border border-slate-700 rounded-3xl px-4 py-1 mb-6">
+                    <span class="text-indigo-400 text-sm font-medium">Unofficial Educational Replica</span>
+                </div>
+                
+                <h1 class="font-display text-6xl md:text-7xl tracking-tighter font-semibold mb-4">Discover how you<br>instinctively take action.</h1>
+                <p class="max-w-md mx-auto text-xl text-slate-400">A free, long-form replica of the Kolbe A™ Index. Understand your natural Method of Operation (MO).</p>
+                
+                <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="startQuiz()" 
+                            class="px-8 py-4 bg-white text-slate-900 hover:bg-amber-50 transition-all font-semibold rounded-3xl text-lg flex items-center justify-center gap-x-3 shadow-xl shadow-indigo-950/50 active:scale-[0.985]">
+                        <span>Start the 36-Question Quiz</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button onclick="document.getElementById('learn-more').scrollIntoView({ behavior: 'smooth' })" 
+                            class="px-7 py-4 border border-slate-700 hover:bg-slate-900 transition-colors font-medium rounded-3xl text-lg">
+                        Learn how it works
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500 mt-4">Takes about 10–14 minutes • 36 questions</p>
+            </div>
+
+            <!-- Strong Disclaimer -->
+            <div class="max-w-2xl mx-auto mb-12 p-5 bg-slate-900 border border-amber-900/40 rounded-3xl">
+                <div class="flex gap-3">
+                    <i class="fa-solid fa-exclamation-triangle text-amber-400 mt-1"></i>
+                    <div class="text-sm">
+                        <span class="font-semibold text-amber-400">Important:</span> 
+                        <span class="text-slate-400">This is an <strong>unofficial educational replica</strong> created for informational and learning purposes only. It is <strong>not</strong> the official Kolbe A™ Index. The real validated assessment is available exclusively at <a href="https://www.kolbe.com" target="_blank" class="underline text-amber-400">kolbe.com</a>. Results here are approximate simulations.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The 4 Modes Preview -->
+            <div id="learn-more" class="mb-16">
+                <div class="text-center mb-8">
+                    <span class="text-indigo-400 text-sm font-semibold tracking-[1.5px] uppercase">The Foundation</span>
+                    <h2 class="font-display text-4xl tracking-tight mt-1">The 4 Action Modes</h2>
+                    <p class="text-slate-400 mt-2 max-w-md mx-auto">Your instinctive strengths across these four areas determine your natural Method of Operation (MO).</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Fact Finder -->
+                    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 hover:border-blue-500/60 transition-colors group">
+                        <div class="w-11 h-11 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-blue-500/20 transition-colors">
+                            <i class="fa-solid fa-search text-blue-400 text-2xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-xl mb-1">Fact Finder</h3>
+                        <p class="text-sm text-slate-400 mb-4">How you gather and share information</p>
+                        <div class="text-xs space-y-1 text-slate-400">
+                            <div class="flex justify-between"><span>High (7-10):</span> <span class="text-blue-400">Initiate research</span></div>
+                            <div class="flex justify-between"><span>Mid (4-6):</span> <span>Respond with essentials</span></div>
+                            <div class="flex justify-between"><span>Low (1-3):</span> <span>Resist excessive detail</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Follow Thru -->
+                    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 hover:border-emerald-500/60 transition-colors group">
+                        <div class="w-11 h-11 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-emerald-500/20 transition-colors">
+                            <i class="fa-solid fa-project-diagram text-emerald-400 text-2xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-xl mb-1">Follow Thru</h3>
+                        <p class="text-sm text-slate-400 mb-4">How you organize, systematize &amp; follow through</p>
+                        <div class="text-xs space-y-1 text-slate-400">
+                            <div class="flex justify-between"><span>High (7-10):</span> <span class="text-emerald-400">Initiate systems</span></div>
+                            <div class="flex justify-between"><span>Mid (4-6):</span> <span>Adapt existing processes</span></div>
+                            <div class="flex justify-between"><span>Low (1-3):</span> <span>Resist rigid structure</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Start -->
+                    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 hover:border-amber-500/60 transition-colors group">
+                        <div class="w-11 h-11 bg-amber-500/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-amber-500/20 transition-colors">
+                            <i class="fa-solid fa-rocket text-amber-400 text-2xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-xl mb-1">Quick Start</h3>
+                        <p class="text-sm text-slate-400 mb-4">How you handle risk, innovation &amp; new ideas</p>
+                        <div class="text-xs space-y-1 text-slate-400">
+                            <div class="flex justify-between"><span>High (7-10):</span> <span class="text-amber-400">Initiate change &amp; ideas</span></div>
+                            <div class="flex justify-between"><span>Mid (4-6):</span> <span>Respond in uncertainty</span></div>
+                            <div class="flex justify-between"><span>Low (1-3):</span> <span>Resist risk &amp; chaos</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Implementor -->
+                    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 hover:border-pink-500/60 transition-colors group">
+                        <div class="w-11 h-11 bg-pink-500/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-pink-500/20 transition-colors">
+                            <i class="fa-solid fa-tools text-pink-400 text-2xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-xl mb-1">Implementor</h3>
+                        <p class="text-sm text-slate-400 mb-4">How you work with space, tangibles &amp; physical execution</p>
+                        <div class="text-xs space-y-1 text-slate-400">
+                            <div class="flex justify-between"><span>High (7-10):</span> <span class="text-pink-400">Initiate building &amp; fixing</span></div>
+                            <div class="flex justify-between"><span>Mid (4-6):</span> <span>Repair &amp; adapt</span></div>
+                            <div class="flex justify-between"><span>Low (1-3):</span> <span>Resist physical work</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button onclick="startQuiz()" 
+                        class="group px-10 py-4 bg-white hover:bg-slate-100 active:bg-white transition-all text-slate-900 font-semibold rounded-3xl text-xl inline-flex items-center gap-x-3 shadow-2xl">
+                    Begin Your Instinct Assessment
+                    <i class="fa-solid fa-play ml-1 group-active:scale-90 transition-transform"></i>
+                </button>
+                <p class="text-[10px] text-slate-500 mt-3">Your answers are stored only in your browser • No data is sent anywhere</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUIZ VIEW -->
+    <div id="quiz-view" class="hidden max-w-3xl mx-auto px-5 pt-8 pb-16">
+        <div class="flex items-center justify-between mb-6 px-1">
+            <div>
+                <span id="question-counter" class="font-mono text-sm tracking-[1.5px] text-slate-400"></span>
+            </div>
+            <div class="flex items-center gap-x-2">
+                <div class="bg-slate-900 border border-slate-700 rounded-2xl px-3 py-1 flex items-center text-xs">
+                    <i class="fa-solid fa-clock text-slate-500 mr-1.5"></i>
+                    <span id="time-estimate">~12 min left</span>
+                </div>
+                <button onclick="exitQuiz()" class="text-xs px-3 py-1.5 hover:bg-slate-800 transition-colors rounded-2xl border border-slate-700 text-slate-400 hover:text-slate-300">
+                    <i class="fa-solid fa-times mr-1"></i> Exit
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="mb-8">
+            <div class="flex justify-between text-xs mb-1.5 px-1 text-slate-400">
+                <div>Progress</div>
+                <div><span id="progress-text">0</span> / 36</div>
+            </div>
+            <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-2 bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-8 shadow-2xl">
+            <div class="flex items-center gap-x-3 mb-4">
+                <div id="mode-badge" 
+                     class="mode-badge px-3 py-1 text-white font-bold flex items-center gap-x-1.5">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="text-xs text-slate-500">Question <span id="q-number"></span> of 36</div>
+            </div>
+
+            <div id="question-text" class="question-text font-medium leading-tight mb-8 text-slate-100">
+                <!-- Populated by JS -->
+            </div>
+
+            <div id="options-container" class="space-y-3">
+                <!-- Options populated dynamically by JS -->
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-between items-center px-2 text-xs">
+            <button onclick="prevQuestion()" id="prev-btn"
+                    class="flex items-center gap-x-2 text-slate-400 hover:text-slate-200 disabled:opacity-40 transition-colors">
+                <i class="fa-solid fa-arrow-left"></i> <span>Previous</span>
+            </button>
+            <div id="next-hint" class="text-slate-500 text-xs hidden">Select an option to continue</div>
+        </div>
+    </div>
+
+    <!-- RESULTS VIEW -->
+    <div id="results-view" class="hidden max-w-4xl mx-auto px-6 pt-10 pb-16">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-3xl mb-4 shadow-inner">
+                <i class="fa-solid fa-chart-line text-white text-3xl"></i>
+            </div>
+            <h2 class="font-display text-5xl tracking-tighter">Your Instinct MO</h2>
+            <p class="text-slate-400 mt-2">Your simulated Method of Operation based on instinctive action patterns</p>
+        </div>
+
+        <!-- MO Code Display -->
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-8 mb-8 text-center">
+            <div class="text-xs tracking-[3px] text-slate-500 mb-3">YOUR METHOD OF OPERATION</div>
+            <div id="mo-code" class="font-display text-[5.5rem] leading-none font-bold tracking-[-4.5px] flex justify-center gap-x-1">
+                <!-- Populated by JS e.g. 7-4-9-2 -->
+            </div>
+            <div id="mo-labels" class="flex justify-center gap-x-3 mt-4 text-xs"></div>
+        </div>
+
+        <!-- Mode Breakdown -->
+        <div class="mb-10">
+            <h3 class="font-semibold text-lg mb-4 px-1">Your Action Mode Scores</h3>
+            <div id="mode-breakdown" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+
+        <!-- Interpretation -->
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-8 mb-8">
+            <h3 class="font-semibold mb-4 flex items-center gap-x-2">
+                <i class="fa-solid fa-lightbulb text-amber-400"></i> 
+                <span>What This Means For You</span>
+            </h3>
+            <div id="interpretation-text" class="prose prose-invert text-sm max-w-none text-slate-300">
+                <!-- JS populated -->
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-wrap gap-3 justify-center">
+            <button onclick="copyResults()" 
+                    class="px-6 py-3.5 bg-white text-slate-900 hover:bg-slate-100 transition-all font-semibold rounded-3xl flex items-center gap-x-2 text-sm">
+                <i class="fa-solid fa-copy"></i> <span>Copy My Results</span>
+            </button>
+            <button onclick="retakeQuiz()" 
+                    class="px-6 py-3.5 border border-slate-700 hover:bg-slate-800 transition-colors font-medium rounded-3xl flex items-center gap-x-2 text-sm">
+                <i class="fa-solid fa-redo"></i> <span>Retake Quiz</span>
+            </button>
+            <a href="https://www.kolbe.com/kolbe-a-index/" target="_blank"
+               class="px-6 py-3.5 border border-slate-700 hover:bg-slate-800 transition-colors font-medium rounded-3xl flex items-center gap-x-2 text-sm">
+                Take the Official Kolbe A™ Index
+            </a>
+        </div>
+
+        <div class="mt-10 text-center">
+            <div class="disclaimer max-w-md mx-auto text-slate-500">
+                Remember: This is an educational simulation only. For accurate, validated results and professional interpretation, please take the official Kolbe A Index at kolbe.com.
+            </div>
+        </div>
+    </div>
+
+    <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
+        <div class="max-w-4xl mx-auto px-6">
+            Instinct MO • Educational replica for informational purposes • Not affiliated with Kolbe Corp or the official Kolbe A™ Index<br>
+            Built as a learning tool to explore conative strengths.
+        </div>
+    </footer>
+
+    <script>
+        // Tailwind config
+        function initTailwind() {
+            document.documentElement.style.setProperty('--accent', '#6366f1');
+        }
+
+        // Data: 36 Questions (9 per mode)
+        const modes = [
+            { id: 'factFinder', name: 'Fact Finder', short: 'FF', color: '#3b82f6', icon: 'fa-search' },
+            { id: 'followThru', name: 'Follow Thru', short: 'FT', color: '#10b981', icon: 'fa-project-diagram' },
+            { id: 'quickStart', name: 'Quick Start', short: 'QS', color: '#f59e0b', icon: 'fa-rocket' },
+            { id: 'implementor', name: 'Implementor', short: 'IM', color: '#ec4899', icon: 'fa-tools' }
+        ];
+
+        let questions = [
+            // Fact Finder (1-9)
+            { id: 1, mode: 'factFinder', text: "When starting a new project or learning something important, you prefer to:", options: [
+                { text: "Dive deep and gather extensive detailed information and research first", points: 4 },
+                { text: "Collect the key facts and essential details before proceeding", points: 3 },
+                { text: "Get a solid overview and then start exploring", points: 2 },
+                { text: "Jump in quickly and learn what you need as you go", points: 1 }
+            ]},
+            { id: 2, mode: 'factFinder', text: "When someone asks you a complex question, your natural response is to:", options: [
+                { text: "Provide a thorough, well-researched answer with sources and context", points: 4 },
+                { text: "Give the most relevant facts and a clear summary", points: 3 },
+                { text: "Offer a concise answer and offer to look up more if needed", points: 2 },
+                { text: "Give a quick high-level response and move on", points: 1 }
+            ]},
+            { id: 3, mode: 'factFinder', text: "In meetings or discussions, you tend to:", options: [
+                { text: "Ask many clarifying questions and want detailed background", points: 4 },
+                { text: "Focus on the most important facts and data presented", points: 3 },
+                { text: "Prefer big picture summaries and key takeaways", points: 2 },
+                { text: "Feel impatient with too much detail and prefer to get to action", points: 1 }
+            ]},
+            { id: 4, mode: 'factFinder', text: "When making an important purchase or decision, you usually:", options: [
+                { text: "Research extensively, read reviews, compare specs in detail", points: 4 },
+                { text: "Do solid research on the top options and key differences", points: 3 },
+                { text: "Look at a few reviews and go with overall reputation", points: 2 },
+                { text: "Make a relatively quick decision based on what feels right", points: 1 }
+            ]},
+            { id: 5, mode: 'factFinder', text: "Your approach to problem-solving often starts with:", options: [
+                { text: "Gathering all available information and analyzing it thoroughly", points: 4 },
+                { text: "Identifying the critical facts and relevant data", points: 3 },
+                { text: "Considering the general situation and possible approaches", points: 2 },
+                { text: "Trying different things to see what works", points: 1 }
+            ]},
+            { id: 6, mode: 'factFinder', text: "When reading articles or reports, you typically:", options: [
+                { text: "Read most of it carefully and take detailed notes", points: 4 },
+                { text: "Read the important sections and key data thoroughly", points: 3 },
+                { text: "Skim for the main points and conclusions", points: 2 },
+                { text: "Scan quickly for anything immediately useful or interesting", points: 1 }
+            ]},
+            { id: 7, mode: 'factFinder', text: "In a new role or situation, your first instinct is to:", options: [
+                { text: "Learn everything possible about the history, processes, and details", points: 4 },
+                { text: "Understand the key facts, rules, and important context", points: 3 },
+                { text: "Get a good general understanding and start contributing", points: 2 },
+                { text: "Start doing the work and pick up details along the way", points: 1 }
+            ]},
+            { id: 8, mode: 'factFinder', text: "When explaining something to others, you tend to:", options: [
+                { text: "Provide lots of background, context, and supporting details", points: 4 },
+                { text: "Include the necessary facts and clear explanations", points: 3 },
+                { text: "Keep it concise and focus on the core message", points: 2 },
+                { text: "Give a brief overview and let them ask questions", points: 1 }
+            ]},
+            { id: 9, mode: 'factFinder', text: "Your natural strength is often in:", options: [
+                { text: "Researching, analyzing data, and providing well-documented insights", points: 4 },
+                { text: "Organizing information and presenting clear, factual summaries", points: 3 },
+                { text: "Seeing the big picture and connecting general concepts", points: 2 },
+                { text: "Taking action quickly and figuring things out experientially", points: 1 }
+            ]},
+
+            // Follow Thru (10-18)
+            { id: 10, mode: 'followThru', text: "When planning a project or event, you prefer to:", options: [
+                { text: "Create detailed step-by-step plans, timelines, and checklists", points: 4 },
+                { text: "Develop a clear structure and sequence of tasks", points: 3 },
+                { text: "Outline the major phases and stay flexible within them", points: 2 },
+                { text: "Keep plans loose and adapt as things unfold", points: 1 }
+            ]},
+            { id: 11, mode: 'followThru', text: "Your desk or digital workspace tends to be:", options: [
+                { text: "Highly organized with systems, folders, and consistent processes", points: 4 },
+                { text: "Mostly organized with good systems in place", points: 3 },
+                { text: "Functional but somewhat flexible or pile-based", points: 2 },
+                { text: "Creative chaos — you know where everything is", points: 1 }
+            ]},
+            { id: 12, mode: 'followThru', text: "When following a process or procedure, you usually:", options: [
+                { text: "Stick closely to the established steps and improve them over time", points: 4 },
+                { text: "Follow the main steps but allow some flexibility", points: 3 },
+                { text: "Use the process as a loose guide", points: 2 },
+                { text: "Often create your own way of doing things", points: 1 }
+            ]},
+            { id: 13, mode: 'followThru', text: "You feel most accomplished when you:", options: [
+                { text: "Complete projects methodically and deliver consistent, reliable results", points: 4 },
+                { text: "Finish tasks in an orderly way with good documentation", points: 3 },
+                { text: "Get things done efficiently even if the process is loose", points: 2 },
+                { text: "Move fast and produce results creatively", points: 1 }
+            ]},
+            { id: 14, mode: 'followThru', text: "In team projects, you naturally tend to:", options: [
+                { text: "Ensure there are clear processes, responsibilities, and timelines", points: 4 },
+                { text: "Help keep things on track and organized", points: 3 },
+                { text: "Contribute ideas and adapt to the group's flow", points: 2 },
+                { text: "Focus on getting things moving and done quickly", points: 1 }
+            ]},
+            { id: 15, mode: 'followThru', text: "When something needs to be repeated or done regularly, you prefer to:", options: [
+                { text: "Create a repeatable system or checklist to ensure consistency", points: 4 },
+                { text: "Develop a reliable routine or process", points: 3 },
+                { text: "Do it well each time but stay flexible", points: 2 },
+                { text: "Handle it in the moment without much structure", points: 1 }
+            ]},
+            { id: 16, mode: 'followThru', text: "Your approach to long-term goals is usually:", options: [
+                { text: "Break them into detailed milestones with tracking systems", points: 4 },
+                { text: "Create clear phases and regular check-ins", points: 3 },
+                { text: "Keep the vision in mind and adjust the path as needed", points: 2 },
+                { text: "Stay inspired and pivot when opportunities appear", points: 1 }
+            ]},
+            { id: 17, mode: 'followThru', text: "When organizing information or files, you tend to:", options: [
+                { text: "Build comprehensive, logical systems and categories", points: 4 },
+                { text: "Create clear folders and consistent naming conventions", points: 3 },
+                { text: "Keep things roughly organized by broad categories", points: 2 },
+                { text: "Use a more intuitive or search-based approach", points: 1 }
+            ]},
+            { id: 18, mode: 'followThru', text: "You get frustrated most when:", options: [
+                { text: "Processes are unclear, inconsistent, or constantly changing", points: 4 },
+                { text: "There is a lack of structure or follow-through on plans", points: 3 },
+                { text: "Things are overly rigid with no room for adaptation", points: 2 },
+                { text: "Too much bureaucracy slows down progress", points: 1 }
+            ]},
+
+            // Quick Start (19-27)
+            { id: 19, mode: 'quickStart', text: "When faced with a new opportunity or idea, your first instinct is to:", options: [
+                { text: "Jump in enthusiastically and start experimenting right away", points: 4 },
+                { text: "Get excited and start exploring possibilities quickly", points: 3 },
+                { text: "Consider it thoughtfully before committing energy", points: 2 },
+                { text: "Prefer to wait and see how it develops before engaging", points: 1 }
+            ]},
+            { id: 20, mode: 'quickStart', text: "In chaotic or rapidly changing situations, you tend to:", options: [
+                { text: "Thrive on the energy and generate many ideas and solutions", points: 4 },
+                { text: "Stay energized and help move things forward", points: 3 },
+                { text: "Feel somewhat uncomfortable and try to bring order", points: 2 },
+                { text: "Prefer to step back until things stabilize", points: 1 }
+            ]},
+            { id: 21, mode: 'quickStart', text: "Your relationship with deadlines and last-minute changes is:", options: [
+                { text: "You often work best under pressure and enjoy the rush", points: 4 },
+                { text: "You can adapt well and produce good work under time pressure", points: 3 },
+                { text: "You prefer steady progress and dislike last-minute scrambles", points: 2 },
+                { text: "You plan ahead to avoid stressful last-minute situations", points: 1 }
+            ]},
+            { id: 22, mode: 'quickStart', text: "When brainstorming, you usually:", options: [
+                { text: "Generate lots of wild, creative ideas very quickly", points: 4 },
+                { text: "Come up with many practical and innovative suggestions", points: 3 },
+                { text: "Contribute thoughtful, considered ideas", points: 2 },
+                { text: "Prefer to build on others' ideas rather than lead ideation", points: 1 }
+            ]},
+            { id: 23, mode: 'quickStart', text: "Starting new projects or ventures feels:", options: [
+                { text: "Exciting and natural — you love the beginning phase", points: 4 },
+                { text: "Energizing once you get going", points: 3 },
+                { text: "A bit daunting but doable with preparation", points: 2 },
+                { text: "Preferable to avoid if possible; you like finishing more", points: 1 }
+            ]},
+            { id: 24, mode: 'quickStart', text: "When rules or processes feel restrictive, you tend to:", options: [
+                { text: "Find creative workarounds or new approaches", points: 4 },
+                { text: "Look for ways to improve or streamline them", points: 3 },
+                { text: "Work within them while suggesting improvements", points: 2 },
+                { text: "Follow them carefully to maintain order", points: 1 }
+            ]},
+            { id: 25, mode: 'quickStart', text: "Your energy level is usually highest when:", options: [
+                { text: "Starting something new or tackling novel challenges", points: 4 },
+                { text: "Working on exciting, fast-moving projects", points: 3 },
+                { text: "Executing well-defined plans and delivering results", points: 2 },
+                { text: "Maintaining stability and perfecting existing systems", points: 1 }
+            ]},
+            { id: 26, mode: 'quickStart', text: "In a crisis or urgent situation, you are often the one who:", options: [
+                { text: "Jumps in with bold ideas and keeps momentum going", points: 4 },
+                { text: "Stays calm and helps generate options quickly", points: 3 },
+                { text: "Helps organize a response and reduce chaos", points: 2 },
+                { text: "Prefers to support from the sidelines until a clear path emerges", points: 1 }
+            ]},
+            { id: 27, mode: 'quickStart', text: "You are most likely to be described by others as:", options: [
+                { text: "Innovative, energetic, and always full of new ideas", points: 4 },
+                { text: "Adaptable and good at handling change and uncertainty", points: 3 },
+                { text: "Reliable and good at bringing structure to situations", points: 2 },
+                { text: "Steady, thoughtful, and careful in your approach", points: 1 }
+            ]},
+
+            // Implementor (28-36)
+            { id: 28, mode: 'implementor', text: "When something physical or tangible needs to be built or fixed, you:", options: [
+                { text: "Enjoy rolling up your sleeves and doing the hands-on work yourself", points: 4 },
+                { text: "Are comfortable getting involved in the physical execution", points: 3 },
+                { text: "Prefer to plan it and have others or tools handle the physical part", points: 2 },
+                { text: "Avoid physical/tangible work when possible; prefer conceptual", points: 1 }
+            ]},
+            { id: 29, mode: 'implementor', text: "Your ideal workspace or environment tends to be:", options: [
+                { text: "Hands-on with tools, materials, or physical prototypes around", points: 4 },
+                { text: "Functional with space to build or test things", points: 3 },
+                { text: "Clean and organized for focused thinking", points: 2 },
+                { text: "Minimal — you work best in your head or on screens", points: 1 }
+            ]},
+            { id: 30, mode: 'implementor', text: "When learning a new physical skill (sports, crafts, tools), you prefer to:", options: [
+                { text: "Get hands-on immediately and learn by doing and adjusting", points: 4 },
+                { text: "Watch a bit then try it yourself with guidance", points: 3 },
+                { text: "Study instructions or watch carefully before trying", points: 2 },
+                { text: "Understand the theory deeply before any physical attempt", points: 1 }
+            ]},
+            { id: 31, mode: 'implementor', text: "In a group setting that requires building or assembling something, you usually:", options: [
+                { text: "Take the lead on the physical construction and assembly", points: 4 },
+                { text: "Contribute actively to the hands-on work", points: 3 },
+                { text: "Help organize and support the building effort", points: 2 },
+                { text: "Focus on planning, coordination, or documentation", points: 1 }
+            ]},
+            { id: 32, mode: 'implementor', text: "Your relationship with "stuff" and physical objects is:", options: [
+                { text: "You enjoy working with tangible things and making them better", points: 4 },
+                { text: "You are comfortable using and maintaining physical tools/items", points: 3 },
+                { text: "You prefer digital or abstract work over physical manipulation", points: 2 },
+                { text: "You actively avoid situations requiring physical dexterity or building", points: 1 }
+            ]},
+            { id: 33, mode: 'implementor', text: "When a device, machine, or system breaks, your instinct is to:", options: [
+                { text: "Open it up and try to fix it yourself with tools", points: 4 },
+                { text: "Diagnose the issue and attempt a repair", points: 3 },
+                { text: "Look up instructions or call someone who can fix it", points: 2 },
+                { text: "Replace it or find a workaround without physical repair", points: 1 }
+            ]},
+            { id: 34, mode: 'implementor', text: "You feel most "in flow" when:", options: [
+                { text: "Working with your hands, building, fixing, or creating physical things", points: 4 },
+                { text: "Combining physical work with practical problem-solving", points: 3 },
+                { text: "Designing systems or processes that others will implement", points: 2 },
+                { text: "Thinking, planning, researching, or creating digitally", points: 1 }
+            ]},
+            { id: 35, mode: 'implementor', text: "If you had to choose a hobby, you would be more drawn to:", options: [
+                { text: "Woodworking, mechanics, gardening, or hands-on making", points: 4 },
+                { text: "Cooking, home improvement, or practical crafts", points: 3 },
+                { text: "Strategy games, writing, or intellectual pursuits", points: 2 },
+                { text: "Abstract thinking, research, or digital creation", points: 1 }
+            ]},
+            { id: 36, mode: 'implementor', text: "Overall, you consider yourself more of a:", options: [
+                { text: "Hands-on doer who likes to build and execute physically", points: 4 },
+                { text: "Practical person comfortable with tangible work", points: 3 },
+                { text: "Thinker and organizer who directs the doing", points: 2 },
+                { text: "Conceptual or strategic person who prefers to stay out of the physical weeds", points: 1 }
+            ]}
+        ];
+
+        let currentQuestionIndex = 0;
+        let answers = {}; // { questionId: points }
+        let quizStartTime = null;
+
+        function saveProgress() {
+            const progress = {
+                currentQuestionIndex,
+                answers,
+                quizStartTime
+            };
+            localStorage.setItem('instinctMO_progress', JSON.stringify(progress));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('instinctMO_progress');
+            if (saved) {
+                const progress = JSON.parse(saved);
+                currentQuestionIndex = progress.currentQuestionIndex || 0;
+                answers = progress.answers || {};
+                quizStartTime = progress.quizStartTime;
+                return true;
+            }
+            return false;
+        }
+
+        function clearProgress() {
+            localStorage.removeItem('instinctMO_progress');
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('progress-text').textContent = currentQuestionIndex;
+        }
+
+        function getModeInfo(modeId) {
+            return modes.find(m => m.id === modeId);
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestionIndex];
+            const modeInfo = getModeInfo(q.mode);
+
+            // Update UI
+            document.getElementById('q-number').textContent = currentQuestionIndex + 1;
+            document.getElementById('question-counter').innerHTML = `Question <span class="font-semibold text-white">${currentQuestionIndex + 1}</span> of ${questions.length}`;
+            document.getElementById('question-text').innerHTML = q.text;
+
+            // Mode badge
+            const badge = document.getElementById('mode-badge');
+            badge.innerHTML = `<i class="fa-solid ${modeInfo.icon} mr-1.5"></i> <span>${modeInfo.name}</span>`;
+            badge.style.backgroundColor = modeInfo.color + '20';
+            badge.style.color = modeInfo.color;
+            badge.style.border = `1px solid ${modeInfo.color}40`;
+
+            // Options
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, index) => {
+                const div = document.createElement('div');
+                div.className = `quiz-option border border-slate-700 hover:border-slate-600 bg-slate-950 rounded-2xl p-4 cursor-pointer flex gap-4 items-start`;
+                div.innerHTML = `
+                    <div class="w-6 h-6 mt-0.5 flex-shrink-0 rounded-full border border-slate-600 flex items-center justify-center text-xs font-mono text-slate-400">
+                        ${String.fromCharCode(65 + index)}
+                    </div>
+                    <div class="flex-1 text-sm leading-snug pt-0.5">${opt.text}</div>
+                `;
+
+                div.onclick = () => selectOption(q.id, opt.points, div);
+
+                // Restore selection if already answered
+                if (answers[q.id] === opt.points) {
+                    div.classList.add('selected', 'border-indigo-500');
+                }
+
+                container.appendChild(div);
+            });
+
+            // Buttons
+            const prevBtn = document.getElementById('prev-btn');
+            prevBtn.disabled = currentQuestionIndex === 0;
+
+            updateProgressBar();
+
+            // Time estimate (rough)
+            const remaining = questions.length - currentQuestionIndex;
+            document.getElementById('time-estimate').textContent = `~${Math.max(2, Math.ceil(remaining * 0.35))} min left`;
+        }
+
+        function selectOption(questionId, points, element) {
+            // Deselect siblings
+            const siblings = element.parentNode.children;
+            for (let sib of siblings) {
+                sib.classList.remove('selected', 'border-indigo-500');
+            }
+            element.classList.add('selected', 'border-indigo-500');
+
+            answers[questionId] = points;
+            saveProgress();
+
+            // Auto advance after short delay for better UX
+            setTimeout(() => {
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    showQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 420);
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion();
+            }
+        }
+
+        function startQuiz() {
+            // Check for saved progress
+            const hasProgress = loadProgress();
+
+            if (hasProgress && currentQuestionIndex > 0 && Object.keys(answers).length > 0) {
+                if (!confirm('Resume your previous quiz progress?')) {
+                    clearProgress();
+                    currentQuestionIndex = 0;
+                    answers = {};
+                }
+            } else {
+                clearProgress();
+                currentQuestionIndex = 0;
+                answers = {};
+            }
+
+            quizStartTime = Date.now();
+
+            document.getElementById('landing-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('results-view').classList.add('hidden');
+
+            showQuestion();
+        }
+
+        function exitQuiz() {
+            if (confirm('Exit the quiz? Your progress will be saved.')) {
+                saveProgress();
+                document.getElementById('quiz-view').classList.add('hidden');
+                document.getElementById('landing-view').classList.remove('hidden');
+            }
+        }
+
+        function calculateResults() {
+            const scores = {};
+            modes.forEach(mode => {
+                scores[mode.id] = 0;
+            });
+
+            // Sum points per mode
+            questions.forEach(q => {
+                if (answers[q.id]) {
+                    scores[q.mode] += answers[q.id];
+                }
+            });
+
+            // Normalize to 1-10 scale (9 questions × 1-4 points = min 9, max 36)
+            const normalized = {};
+            modes.forEach(mode => {
+                const raw = scores[mode.id] || 9; // default low if no answers
+                // Map 9-36 to 1-10
+                let norm = Math.round(((raw - 9) / (36 - 9)) * 9) + 1;
+                norm = Math.max(1, Math.min(10, norm));
+                normalized[mode.id] = norm;
+            });
+
+            return normalized;
+        }
+
+        function getLevel(score) {
+            if (score >= 7) return { label: 'Initiate', desc: 'You naturally lead with this mode.' };
+            if (score >= 4) return { label: 'Respond', desc: 'You accommodate and work with this mode.' };
+            return { label: 'Resist', desc: 'You tend to avoid or need support in this mode.' };
+        }
+
+        function finishQuiz() {
+            const scores = calculateResults();
+
+            // Hide quiz, show results
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById('results-view').classList.remove('hidden');
+
+            // Display MO code
+            const moCodeEl = document.getElementById('mo-code');
+            const moString = `${scores.factFinder}-${scores.followThru}-${scores.quickStart}-${scores.implementor}`;
+            moCodeEl.innerHTML = moString.split('-').map((num, i) => {
+                const mode = modes[i];
+                return `<span style="color: ${mode.color}">${num}</span>`;
+            }).join('<span class="text-slate-600 mx-1">-</span>');
+
+            // Labels under MO
+            const labelsContainer = document.getElementById('mo-labels');
+            labelsContainer.innerHTML = modes.map((mode, i) => {
+                const score = scores[mode.id];
+                const level = getLevel(score);
+                return `<div class="px-3 py-1 rounded-2xl text-xs" style="background-color: ${mode.color}15; color: ${mode.color}">${mode.short} ${level.label}</div>`;
+            }).join('');
+
+            // Mode breakdown cards
+            const breakdownContainer = document.getElementById('mode-breakdown');
+            breakdownContainer.innerHTML = '';
+
+            modes.forEach(mode => {
+                const score = scores[mode.id];
+                const level = getLevel(score);
+                const percentage = ((score - 1) / 9) * 100;
+
+                const card = document.createElement('div');
+                card.className = `bg-slate-900 border border-slate-700 rounded-3xl p-5`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-x-3">
+                            <div style="background-color: ${mode.color}15; color: ${mode.color}" class="w-9 h-9 rounded-2xl flex items-center justify-center">
+                                <i class="fa-solid ${mode.icon} text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">${mode.name}</div>
+                                <div class="text-xs" style="color: ${mode.color}">${level.label} • Score ${score}/10</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold" style="color: ${mode.color}">${score}</div>
+                        </div>
+                    </div>
+                    <div class="h-2.5 bg-slate-800 rounded-full overflow-hidden mb-3">
+                        <div class="h-2.5 rounded-full result-bar" style="width: ${percentage}%; background-color: ${mode.color}"></div>
+                    </div>
+                    <div class="text-xs text-slate-400">${level.desc}</div>
+                `;
+                breakdownContainer.appendChild(card);
+            });
+
+            // Interpretation text
+            const interpEl = document.getElementById('interpretation-text');
+            let interpHTML = `<p class="mb-3">Your instinctive Method of Operation (MO) is <strong>${moString}</strong>. This combination reveals how you naturally approach problems, make decisions, and take action when free to be yourself.</p>`;
+
+            // Simple dynamic interpretation based on highest/lowest
+            const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+            const highest = sorted[0];
+            const lowest = sorted[3];
+
+            const highMode = modes.find(m => m.id === highest[0]);
+            const lowMode = modes.find(m => m.id === lowest[0]);
+
+            interpHTML += `<p class="mb-3">Your strongest instinctive mode is <strong style="color:${highMode.color}">${highMode.name}</strong> (${highest[1]}/10). You naturally lead with this strength. `;
+            if (highest[1] >= 8) interpHTML += `You are likely seen as highly capable in this area and should lean into it for maximum energy and results.</p>`;
+            else interpHTML += `You comfortably initiate in this area.</p>`;
+
+            interpHTML += `<p>Your lowest mode is <strong style="color:${lowMode.color}">${lowMode.name}</strong> (${lowest[1]}/10). This is an area where you may naturally resist or need support, systems, or delegation to avoid frustration.</p>`;
+
+            interpHTML += `<p class="mt-4 text-xs opacity-75">Tip: The goal is not to change your MO but to arrange your work and environment so you spend more time operating in your high modes and get support in lower ones.</p>`;
+
+            interpEl.innerHTML = interpHTML;
+
+            // Clear saved progress
+            clearProgress();
+        }
+
+        function copyResults() {
+            const moCode = document.getElementById('mo-code').innerText;
+            const text = `My Instinct MO (educational replica): ${moCode}
+
+` +
+                `This is from an unofficial educational simulation of the Kolbe A Index.
+` +
+                `For the real assessment: https://www.kolbe.com/kolbe-a-index/`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = event.currentTarget ? event.currentTarget.innerHTML : '';
+                const btns = document.querySelectorAll('#results-view button');
+                btns.forEach(b => {
+                    if (b.innerText.includes('Copy')) {
+                        const orig = b.innerHTML;
+                        b.innerHTML = `<i class="fa-solid fa-check"></i> <span>Copied!</span>`;
+                        setTimeout(() => { b.innerHTML = orig; }, 2200);
+                    }
+                });
+            }).catch(() => {
+                alert('Results copied to clipboard: ' + moCode);
+            });
+        }
+
+        function retakeQuiz() {
+            if (confirm('Start a new quiz?')) {
+                clearProgress();
+                currentQuestionIndex = 0;
+                answers = {};
+                document.getElementById('results-view').classList.add('hidden');
+                document.getElementById('landing-view').classList.remove('hidden');
+            }
+        }
+
+        // Keyboard support
+        function setupKeyboard() {
+            document.addEventListener('keydown', function(e) {
+                if (document.getElementById('quiz-view').classList.contains('hidden')) return;
+
+                if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                    const selected = document.querySelector('.quiz-option.selected');
+                    if (selected) {
+                        // already handled by click
+                    } else {
+                        // do nothing
+                    }
+                }
+                if (e.key === 'ArrowLeft') {
+                    prevQuestion();
+                }
+            });
+
+            // Allow number keys 1-4 to select options
+            document.addEventListener('keypress', function(e) {
+                if (document.getElementById('quiz-view').classList.contains('hidden')) return;
+                const num = parseInt(e.key);
+                if (num >= 1 && num <= 4) {
+                    const options = document.querySelectorAll('#options-container .quiz-option');
+                    if (options[num-1]) {
+                        options[num-1].click();
+                    }
+                }
+            });
+        }
+
+        function init() {
+            initTailwind();
+            setupKeyboard();
+
+            // Optional: Preload hint
+            console.log('%c[Instinct MO] Educational replica ready. All data stays in browser.', 'color:#64748b');
+        }
+
+        // Boot
+        window.onload = init;
+    </script>
+</body>
+</html>
