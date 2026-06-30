@@ -23,7 +23,7 @@
         .mode-quick { color: #f59e0b; }
         .mode-impl { color: #ec4899; }
         .quiz-option {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
         .quiz-option:hover {
             transform: translateY(-2px);
@@ -31,7 +31,7 @@
         }
         .quiz-option.selected {
             border-color: #6366f1;
-            background-color: #f0f0ff;
+            background-color: #eef2ff;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
         .section-header {
@@ -108,7 +108,7 @@
                 <p class="max-w-md mx-auto text-xl text-slate-400">A free, long-form replica of the Kolbe A™ Index. Understand your natural Method of Operation (MO).</p>
                 
                 <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-                    <button onclick="startQuiz()" 
+                    <button data-start-quiz 
                             class="px-8 py-4 bg-white text-slate-900 hover:bg-amber-50 transition-all font-semibold rounded-3xl text-lg flex items-center justify-center gap-x-3 shadow-xl shadow-indigo-950/50 active:scale-[0.985]">
                         <span>Start the 36-Question Quiz</span>
                         <i class="fa-solid fa-arrow-right"></i>
@@ -200,7 +200,7 @@
             </div>
 
             <div class="text-center">
-                <button onclick="startQuiz()" 
+                <button data-start-quiz 
                         class="group px-10 py-4 bg-white hover:bg-slate-100 active:bg-white transition-all text-slate-900 font-semibold rounded-3xl text-xl inline-flex items-center gap-x-3 shadow-2xl">
                     Begin Your Instinct Assessment
                     <i class="fa-solid fa-play ml-1 group-active:scale-90 transition-transform"></i>
@@ -542,7 +542,7 @@
                 { text: "Help organize and support the building effort", points: 2 },
                 { text: "Focus on planning, coordination, or documentation", points: 1 }
             ]},
-            { id: 32, mode: 'implementor', text: "Your relationship with "stuff" and physical objects is:", options: [
+            { id: 32, mode: 'implementor', text: "Your relationship with \"stuff\" and physical objects is:", options: [
                 { text: "You enjoy working with tangible things and making them better", points: 4 },
                 { text: "You are comfortable using and maintaining physical tools/items", points: 3 },
                 { text: "You prefer digital or abstract work over physical manipulation", points: 2 },
@@ -554,7 +554,7 @@
                 { text: "Look up instructions or call someone who can fix it", points: 2 },
                 { text: "Replace it or find a workaround without physical repair", points: 1 }
             ]},
-            { id: 34, mode: 'implementor', text: "You feel most "in flow" when:", options: [
+            { id: 34, mode: 'implementor', text: "You feel most \"in flow\" when:", options: [
                 { text: "Working with your hands, building, fixing, or creating physical things", points: 4 },
                 { text: "Combining physical work with practical problem-solving", points: 3 },
                 { text: "Designing systems or processes that others will implement", points: 2 },
@@ -575,7 +575,7 @@
         ];
 
         let currentQuestionIndex = 0;
-        let answers = {}; // { questionId: points }
+        let answers = {};
         let quizStartTime = null;
 
         function saveProgress() {
@@ -617,19 +617,16 @@
             const q = questions[currentQuestionIndex];
             const modeInfo = getModeInfo(q.mode);
 
-            // Update UI
             document.getElementById('q-number').textContent = currentQuestionIndex + 1;
             document.getElementById('question-counter').innerHTML = `Question <span class="font-semibold text-white">${currentQuestionIndex + 1}</span> of ${questions.length}`;
             document.getElementById('question-text').innerHTML = q.text;
 
-            // Mode badge
             const badge = document.getElementById('mode-badge');
             badge.innerHTML = `<i class="fa-solid ${modeInfo.icon} mr-1.5"></i> <span>${modeInfo.name}</span>`;
             badge.style.backgroundColor = modeInfo.color + '20';
             badge.style.color = modeInfo.color;
             badge.style.border = `1px solid ${modeInfo.color}40`;
 
-            // Options
             const container = document.getElementById('options-container');
             container.innerHTML = '';
 
@@ -645,7 +642,6 @@
 
                 div.onclick = () => selectOption(q.id, opt.points, div);
 
-                // Restore selection if already answered
                 if (answers[q.id] === opt.points) {
                     div.classList.add('selected', 'border-indigo-500');
                 }
@@ -653,19 +649,16 @@
                 container.appendChild(div);
             });
 
-            // Buttons
             const prevBtn = document.getElementById('prev-btn');
             prevBtn.disabled = currentQuestionIndex === 0;
 
             updateProgressBar();
 
-            // Time estimate (rough)
             const remaining = questions.length - currentQuestionIndex;
             document.getElementById('time-estimate').textContent = `~${Math.max(2, Math.ceil(remaining * 0.35))} min left`;
         }
 
         function selectOption(questionId, points, element) {
-            // Deselect siblings
             const siblings = element.parentNode.children;
             for (let sib of siblings) {
                 sib.classList.remove('selected', 'border-indigo-500');
@@ -675,7 +668,6 @@
             answers[questionId] = points;
             saveProgress();
 
-            // Auto advance after short delay for better UX
             setTimeout(() => {
                 if (currentQuestionIndex < questions.length - 1) {
                     currentQuestionIndex++;
@@ -694,11 +686,14 @@
         }
 
         function startQuiz() {
-            // Check for saved progress
+            console.log('%c[Instinct MO] startQuiz() called', 'color:#64748b');
+
             const hasProgress = loadProgress();
 
             if (hasProgress && currentQuestionIndex > 0 && Object.keys(answers).length > 0) {
-                if (!confirm('Resume your previous quiz progress?')) {
+                if (confirm('You have saved progress. Resume where you left off?')) {
+                    // keep the loaded progress
+                } else {
                     clearProgress();
                     currentQuestionIndex = 0;
                     answers = {};
@@ -713,13 +708,14 @@
 
             document.getElementById('landing-view').classList.add('hidden');
             document.getElementById('quiz-view').classList.remove('hidden');
-            document.getElementById('results-view').classList.add('hidden');
+            const resultsView = document.getElementById('results-view');
+            if (resultsView) resultsView.classList.add('hidden');
 
             showQuestion();
         }
 
         function exitQuiz() {
-            if (confirm('Exit the quiz? Your progress will be saved.')) {
+            if (confirm('Exit the quiz? Your progress will be saved in this browser.')) {
                 saveProgress();
                 document.getElementById('quiz-view').classList.add('hidden');
                 document.getElementById('landing-view').classList.remove('hidden');
@@ -728,22 +724,17 @@
 
         function calculateResults() {
             const scores = {};
-            modes.forEach(mode => {
-                scores[mode.id] = 0;
-            });
+            modes.forEach(mode => { scores[mode.id] = 0; });
 
-            // Sum points per mode
             questions.forEach(q => {
                 if (answers[q.id]) {
                     scores[q.mode] += answers[q.id];
                 }
             });
 
-            // Normalize to 1-10 scale (9 questions × 1-4 points = min 9, max 36)
             const normalized = {};
             modes.forEach(mode => {
-                const raw = scores[mode.id] || 9; // default low if no answers
-                // Map 9-36 to 1-10
+                const raw = scores[mode.id] || 9;
                 let norm = Math.round(((raw - 9) / (36 - 9)) * 9) + 1;
                 norm = Math.max(1, Math.min(10, norm));
                 normalized[mode.id] = norm;
@@ -761,11 +752,9 @@
         function finishQuiz() {
             const scores = calculateResults();
 
-            // Hide quiz, show results
             document.getElementById('quiz-view').classList.add('hidden');
             document.getElementById('results-view').classList.remove('hidden');
 
-            // Display MO code
             const moCodeEl = document.getElementById('mo-code');
             const moString = `${scores.factFinder}-${scores.followThru}-${scores.quickStart}-${scores.implementor}`;
             moCodeEl.innerHTML = moString.split('-').map((num, i) => {
@@ -773,7 +762,6 @@
                 return `<span style="color: ${mode.color}">${num}</span>`;
             }).join('<span class="text-slate-600 mx-1">-</span>');
 
-            // Labels under MO
             const labelsContainer = document.getElementById('mo-labels');
             labelsContainer.innerHTML = modes.map((mode, i) => {
                 const score = scores[mode.id];
@@ -781,7 +769,6 @@
                 return `<div class="px-3 py-1 rounded-2xl text-xs" style="background-color: ${mode.color}15; color: ${mode.color}">${mode.short} ${level.label}</div>`;
             }).join('');
 
-            // Mode breakdown cards
             const breakdownContainer = document.getElementById('mode-breakdown');
             breakdownContainer.innerHTML = '';
 
@@ -815,11 +802,9 @@
                 breakdownContainer.appendChild(card);
             });
 
-            // Interpretation text
             const interpEl = document.getElementById('interpretation-text');
             let interpHTML = `<p class="mb-3">Your instinctive Method of Operation (MO) is <strong>${moString}</strong>. This combination reveals how you naturally approach problems, make decisions, and take action when free to be yourself.</p>`;
 
-            // Simple dynamic interpretation based on highest/lowest
             const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
             const highest = sorted[0];
             const lowest = sorted[3];
@@ -837,21 +822,14 @@
 
             interpEl.innerHTML = interpHTML;
 
-            // Clear saved progress
             clearProgress();
         }
 
         function copyResults() {
             const moCode = document.getElementById('mo-code').innerText;
-            const text = `My Instinct MO (educational replica): ${moCode}
-
-` +
-                `This is from an unofficial educational simulation of the Kolbe A Index.
-` +
-                `For the real assessment: https://www.kolbe.com/kolbe-a-index/`;
+            const text = `My Instinct MO (educational replica): ${moCode}\n\nThis is from an unofficial educational simulation of the Kolbe A Index.\nFor the real assessment: https://www.kolbe.com/kolbe-a-index/`;
 
             navigator.clipboard.writeText(text).then(() => {
-                const originalText = event.currentTarget ? event.currentTarget.innerHTML : '';
                 const btns = document.querySelectorAll('#results-view button');
                 btns.forEach(b => {
                     if (b.innerText.includes('Copy')) {
@@ -875,17 +853,14 @@
             }
         }
 
-        // Keyboard support
         function setupKeyboard() {
             document.addEventListener('keydown', function(e) {
                 if (document.getElementById('quiz-view').classList.contains('hidden')) return;
 
                 if (e.key === 'ArrowRight' || e.key === 'Enter') {
                     const selected = document.querySelector('.quiz-option.selected');
-                    if (selected) {
-                        // already handled by click
-                    } else {
-                        // do nothing
+                    if (selected && selected.onclick) {
+                        // trigger if needed
                     }
                 }
                 if (e.key === 'ArrowLeft') {
@@ -893,7 +868,6 @@
                 }
             });
 
-            // Allow number keys 1-4 to select options
             document.addEventListener('keypress', function(e) {
                 if (document.getElementById('quiz-view').classList.contains('hidden')) return;
                 const num = parseInt(e.key);
@@ -910,11 +884,14 @@
             initTailwind();
             setupKeyboard();
 
-            // Optional: Preload hint
-            console.log('%c[Instinct MO] Educational replica ready. All data stays in browser.', 'color:#64748b');
+            // Attach click handlers to start buttons (more reliable than inline onclick)
+            document.querySelectorAll('[data-start-quiz]').forEach(btn => {
+                btn.addEventListener('click', startQuiz);
+            });
+
+            console.log('%c[Instinct MO] Educational replica initialized successfully. All systems ready.', 'color:#64748b');
         }
 
-        // Boot
         window.onload = init;
     </script>
 </body>
